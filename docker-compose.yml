@@ -1,5 +1,3 @@
-version: "3.8"
-
 networks:
   proxy:
     name: studygen
@@ -12,20 +10,38 @@ volumes:
   mongodb_data:
 
 services:
-  mongodb:
+  # mongo-setup:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile_mongodb
+  #   container_name: mongodb-setup
+  #   restart: "no"
+  #   networks:
+  #     - proxy
+  #   volumes:
+  #     - mongodb_data:/data/db
+  #   depends_on:
+  #     - mongo1
+
+  mongo1:
     build:
       context: .
       dockerfile: Dockerfile_mongodb
-    container_name: mongodb
-    hostname: mongodb
+    container_name: mongo1
+    hostname: mongo1
     restart: always
     networks:
       - proxy
     ports:
-      - "27017:27017"
+      - 27017:27017
+    expose:
+      - 27017
     volumes:
       - mongodb_data:/data/db
-    command: "mongod --bind_ip_all"
+    # environment:
+    #   MONGO_INITDB_ROOT_USERNAME: root
+    #   MONGO_INITDB_ROOT_PASSWORD: 123456
+    # command: "mongod --bind_ip_all --replSet=rs0"
 
   studygen:
     build:
@@ -34,7 +50,9 @@ services:
     container_name: studygen
     restart: always
     depends_on:
-      - mongodb
+      - mongo1
+    # extra_hosts:
+    #   - "host.docker.internal:host-gateway"
     networks:
       - proxy
     ports:
@@ -43,7 +61,8 @@ services:
       NODE_ENV: ${NODE_ENV}
       PORT: ${PORT}
       SECRET: ${SECRET}
-      DATABASE_HOST: mongodb
+      # DATABASE_HOST: host.docker.internal
+      DATABASE_HOST: mongo1
       DATABASE_PORT: ${DATABASE_PORT}
       DATABASE_NAME: ${DATABASE_NAME}
       DATABASE_USERNAME: ${DATABASE_USERNAME}
@@ -54,3 +73,4 @@ services:
       SECURE_COOKIE: ${SECURE_COOKIE}
       ENCRYPTION_KEY: ${ENCRYPTION_KEY}
       AUTO_INDEX: ${AUTO_INDEX}
+    # command: "tail -f dev/null"

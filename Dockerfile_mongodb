@@ -15,3 +15,4 @@ COPY mongod.conf /etc/mongod.conf
 COPY mongo-init.js /docker-entrypoint-initdb.d/mongo-init.js
 
 CMD ["mongod", "-f", "/etc/mongod.conf"]
+# CMD ["mongod", "--bind_ip_all", "--replSet", "rs0"]
