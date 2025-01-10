@@ -10,19 +10,6 @@ volumes:
   mongodb_data:
 
 services:
-  # mongo-setup:
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile_mongodb
-  #   container_name: mongodb-setup
-  #   restart: "no"
-  #   networks:
-  #     - proxy
-  #   volumes:
-  #     - mongodb_data:/data/db
-  #   depends_on:
-  #     - mongo1
-
   mongo1:
     build:
       context: .
@@ -38,10 +25,6 @@ services:
       - 27017
     volumes:
       - mongodb_data:/data/db
-    # environment:
-    #   MONGO_INITDB_ROOT_USERNAME: root
-    #   MONGO_INITDB_ROOT_PASSWORD: 123456
-    # command: "mongod --bind_ip_all --replSet=rs0"
 
   studygen:
     build:
@@ -51,8 +34,6 @@ services:
     restart: always
     depends_on:
       - mongo1
-    # extra_hosts:
-    #   - "host.docker.internal:host-gateway"
     networks:
       - proxy
     ports:
@@ -61,7 +42,6 @@ services:
       NODE_ENV: ${NODE_ENV}
       PORT: ${PORT}
       SECRET: ${SECRET}
-      # DATABASE_HOST: host.docker.internal
       DATABASE_HOST: mongo1
       DATABASE_PORT: ${DATABASE_PORT}
       DATABASE_NAME: ${DATABASE_NAME}
@@ -73,4 +53,3 @@ services:
       SECURE_COOKIE: ${SECURE_COOKIE}
       ENCRYPTION_KEY: ${ENCRYPTION_KEY}
       AUTO_INDEX: ${AUTO_INDEX}
-    # command: "tail -f dev/null"
